@@ -20,6 +20,7 @@ class Board extends ObjectModel
     static $fields = array(
         'activity_logs'     => [ 'type' => '[ActivityLogType]'  , 'object' => 'ActivityLogType' ],
         'board_folder_id'   => [ 'type' => 'Int'         ],
+        'workspace_id'      => [ 'type' => 'Int'         ],
         'board_kind'        => [ 'type' => 'BoardKind'       ],
         'columns'           => [ 'type' => '[Column]'       , 'object' => 'Column' ],
         'communication'     => [ 'type' => 'JSON'        ],
