@@ -121,7 +121,7 @@ class MondayBoard extends MondayAPI
         return $this->request(self::TYPE_MUTAT, $create);
     }
 
-    public function addSubItem( Int $parent_item_id, String $item_name, Array $itens = [] )
+    public function addSubItem( Int $parent_item_id, String $item_name, Array $itens = [], $create_labels_if_missing = false)
     {
         $arguments = [
             'parent_item_id'  => $parent_item_id,
@@ -136,6 +136,9 @@ class MondayBoard extends MondayAPI
             $SubItem->getArguments($arguments, SubItem::$create_item_arguments),
             $SubItem->getFields(['id'])
         );
+
+        if ($create_labels_if_missing)
+            $create = str_replace('}"){', '}", create_labels_if_missing:true){', $create);
 
         return $this->request(self::TYPE_MUTAT, $create);
     }
