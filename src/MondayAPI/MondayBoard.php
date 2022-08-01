@@ -27,7 +27,14 @@ class MondayBoard extends MondayAPI
         return $this;
     }
 
-    public function create(string $board_name, string $board_kind = BoardKind::PRV, array $optionals = [])
+    /**
+     * Create a new monday board and return its id on success.
+     * @param string $board_name
+     * @param string $board_kind
+     * @param array $optionals
+     * @return int|bool
+     */
+    public function create(string $board_name, string $board_kind = BoardKind::PRV, array $optionals = []): int|bool
     {
         $Board = new Board();
 
@@ -39,7 +46,7 @@ class MondayBoard extends MondayAPI
             $Board->getFields(['id'])
         );
 
-        return $this->request(self::TYPE_MUTAT, $create);
+        return $this->request(self::TYPE_MUTAT, $create)['create_board']['id'] ?? false;
     }
 
     public function archiveBoard(array $fields = [])
@@ -59,7 +66,7 @@ class MondayBoard extends MondayAPI
         return $this->request(self::TYPE_MUTAT, $create);
     }
 
-    public function getBoards(array $arguments = [], array $fields = [])
+    public function getBoards(array $arguments = [], array $fields = []): array
     {
         $Board = new Board();
 
@@ -73,7 +80,7 @@ class MondayBoard extends MondayAPI
             $Board->getFields($fields)
         );
 
-        return $this->request(self::TYPE_QUERY, $boards);
+        return $this->request(self::TYPE_QUERY, $boards)['boards']?? [];
     }
 
     public function getColumns(array $fields = [])
@@ -96,7 +103,12 @@ class MondayBoard extends MondayAPI
         return $this->request(self::TYPE_QUERY, $boards);
     }
 
-    public function createGroup(string $name)
+    /**
+     * Create a group and return its id on success.
+     * @param string $name
+     * @return string|bool
+     */
+    public function createGroup(string $name): string|bool
     {
         $group = new Group();
         if (empty($this->board_id)) {
@@ -111,10 +123,10 @@ class MondayBoard extends MondayAPI
             $group->getFields(['id'])
         );
 
-        return $this->request(self::TYPE_MUTAT, $create);
+        return $this->request(self::TYPE_MUTAT, $create)['create_group']['id'] ?? false;
     }
 
-    public function createColumn(string $name, string $type = 'text', string $description = '')
+    public function createColumn(string $name, string $type = 'text', string $description = ''): string|bool
     {
         if (empty($this->board_id)) {
             return false;
@@ -131,11 +143,11 @@ class MondayBoard extends MondayAPI
             ['id']
         );
 
-        return $this->request(self::TYPE_MUTAT, $create);
+        return $this->request(self::TYPE_MUTAT, $create)['create_column']['id'] ?? false;
     }
 
 
-    public function getItems(array $arguments = [], array $fields = [])
+    public function getItems(array $arguments = [], array $fields = []): array
     {
         $Item = new Item();
 
@@ -153,10 +165,10 @@ class MondayBoard extends MondayAPI
             $items = str_replace($field, $field . ' {' . implode(' ', $value) . '}', $items);
         }
 
-        return $this->request(self::TYPE_QUERY, $items);
+        return $this->request(self::TYPE_QUERY, $items)['items'] ?? [];
     }
 
-    public function addItem(string $item_name, array $itens = [], $create_labels_if_missing = false)
+    public function addItem(string $item_name, array $itens = [], $create_labels_if_missing = false): int|false
     {
         if (!$this->board_id || !$this->group_id)
             return -1;
@@ -164,7 +176,7 @@ class MondayBoard extends MondayAPI
         $arguments = [
             'board_id' => $this->board_id,
             'group_id' => $this->group_id,
-            'item_name' => $item_name,
+            'item_name' => addslashes($item_name),
             'column_values' => Column::newColumnValues($itens),
         ];
 
@@ -176,10 +188,11 @@ class MondayBoard extends MondayAPI
             $Item->getFields(['id'])
         );
 
-        if ($create_labels_if_missing)
+        if ($create_labels_if_missing) {
             $create = str_replace('}"){', '}", create_labels_if_missing:true){', $create);
+        }
 
-        return $this->request(self::TYPE_MUTAT, $create);
+        return $this->request(self::TYPE_MUTAT, $create)['create_item']['id'] ?? false;
     }
 
     public function addSubItem(int $parent_item_id, string $item_name, array $itens = [], $create_labels_if_missing = false)
@@ -230,7 +243,7 @@ class MondayBoard extends MondayAPI
         return $this->request(self::TYPE_MUTAT, $delete);
     }
 
-    public function changeMultipleColumnValues(int $item_id, array $column_values = [])
+    public function changeMultipleColumnValues(int $item_id, array $column_values = []): int|false
     {
         if (!$this->board_id || !$this->group_id)
             return -1;
@@ -249,7 +262,7 @@ class MondayBoard extends MondayAPI
             $Item->getFields(['id'])
         );
 
-        return $this->request(self::TYPE_MUTAT, $create);
+        return $this->request(self::TYPE_MUTAT, $create)['change_multiple_column_values']['id'] ?? false;
     }
 
     public function customQuery($query)
