@@ -2,6 +2,7 @@
 
 namespace TBlack\MondayAPI;
 
+use TBlack\MondayAPI\ObjectTypes\Group;
 use TBlack\MondayAPI\Querying\Query;
 use TBlack\MondayAPI\ObjectTypes\Item;
 use TBlack\MondayAPI\ObjectTypes\SubItem;
@@ -93,6 +94,66 @@ class MondayBoard extends MondayAPI
         );
 
         return $this->request( self::TYPE_QUERY, $boards );
+    }
+
+    public function createGroup(string $name)
+    {
+        $group = new Group();
+        if (empty($this->board_id)) {
+            return false;
+        }
+
+        $arguments = ['group_name' => $name, 'board_id' => $this->board_id];
+
+        $create = Query::create(
+            'create_group',
+            $group->getArguments($arguments, Group::$createItemArguments),
+            $group->getFields(['id'])
+        );
+
+        return $this->request(self::TYPE_MUTAT, $create);
+    }
+
+    public function createColumn(string $name, string $type = 'text', string $description = '')
+    {
+        if (empty($this->board_id)) {
+            return false;
+        }
+
+        $arguments = [
+            'title' => $name, 'description' => $description,
+            'board_id' => $this->board_id
+        ];
+
+        $create = Query::create(
+            'create_column',
+            Query::buildArguments($arguments, ' column_type:'.$type.', '),
+            ['id']
+        );
+
+        return $this->request(self::TYPE_MUTAT, $create);
+    }
+
+
+    public function getItems( array $arguments = [], Array $fields = [])
+    {
+        $Item = new Item();
+
+        $items = Query::create(
+            Item::$scope,
+            $Item->getArguments($arguments),
+            $Item->getFields($fields)
+        );
+
+        foreach ($fields as $field => $value) {
+            if (!is_array($value)) {
+                continue;
+            }
+
+            $items = str_replace($field,  $field .' {' . implode(' ', $value) . '}', $items);
+        }
+
+        return $this->request( self::TYPE_QUERY, $items );
     }
 
     public function addItem(String $item_name, array $itens = [], $create_labels_if_missing = false)
