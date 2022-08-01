@@ -15,39 +15,39 @@ class MondayBoard extends MondayAPI
     protected $board_id = false;
     protected $group_id = false;
 
-    public function on( Int $board_id )
+    public function on(int $board_id)
     {
         $this->board_id = $board_id;
         return $this;
     }
 
-    public function group( String $group_id )
+    public function group(string $group_id)
     {
         $this->group_id = $group_id;
         return $this;
     }
 
-    public function create( String $board_name, String $board_kind = BoardKind::PRV, Array $optionals = [] )
+    public function create(string $board_name, string $board_kind = BoardKind::PRV, array $optionals = [])
     {
         $Board = new Board();
 
-        $arguments = array_merge( ['board_name' => $board_name], $optionals);
+        $arguments = array_merge(['board_name' => $board_name], $optionals);
 
         $create = Query::create(
             'create_board',
-            $Board->getArguments($arguments, Board::$create_item_arguments, ' board_kind:'.$board_kind.', '),
+            $Board->getArguments($arguments, Board::$create_item_arguments, ' board_kind:' . $board_kind . ', '),
             $Board->getFields(['id'])
         );
 
         return $this->request(self::TYPE_MUTAT, $create);
     }
 
-    public function archiveBoard( Array $fields = [] )
+    public function archiveBoard(array $fields = [])
     {
         $Board = new Board();
 
         $arguments = [
-            'board_id'      => $this->board_id,
+            'board_id' => $this->board_id,
         ];
 
         $create = Query::create(
@@ -59,12 +59,12 @@ class MondayBoard extends MondayAPI
         return $this->request(self::TYPE_MUTAT, $create);
     }
 
-    public function getBoards( Array $arguments = [], Array $fields = [])
+    public function getBoards(array $arguments = [], array $fields = [])
     {
         $Board = new Board();
 
-        if($this->board_id!==false&&!isset($arguments['ids'])){
-            $arguments['ids']=$this->board_id;
+        if ($this->board_id !== false && !isset($arguments['ids'])) {
+            $arguments['ids'] = $this->board_id;
         }
 
         $boards = Query::create(
@@ -73,10 +73,10 @@ class MondayBoard extends MondayAPI
             $Board->getFields($fields)
         );
 
-        return $this->request( self::TYPE_QUERY, $boards );
+        return $this->request(self::TYPE_QUERY, $boards);
     }
 
-    public function getColumns( Array $fields = [] )
+    public function getColumns(array $fields = [])
     {
         $Column = new Column();
         $Board = new Board();
@@ -89,11 +89,11 @@ class MondayBoard extends MondayAPI
 
         $boards = Query::create(
             Board::$scope,
-            $Board->getArguments(['ids'=>$this->board_id]),
+            $Board->getArguments(['ids' => $this->board_id]),
             [$columns]
         );
 
-        return $this->request( self::TYPE_QUERY, $boards );
+        return $this->request(self::TYPE_QUERY, $boards);
     }
 
     public function createGroup(string $name)
@@ -127,7 +127,7 @@ class MondayBoard extends MondayAPI
 
         $create = Query::create(
             'create_column',
-            Query::buildArguments($arguments, ' column_type:'.$type.', '),
+            Query::buildArguments($arguments, ' column_type:' . $type . ', '),
             ['id']
         );
 
@@ -135,7 +135,7 @@ class MondayBoard extends MondayAPI
     }
 
 
-    public function getItems( array $arguments = [], Array $fields = [])
+    public function getItems(array $arguments = [], array $fields = [])
     {
         $Item = new Item();
 
@@ -150,21 +150,21 @@ class MondayBoard extends MondayAPI
                 continue;
             }
 
-            $items = str_replace($field,  $field .' {' . implode(' ', $value) . '}', $items);
+            $items = str_replace($field, $field . ' {' . implode(' ', $value) . '}', $items);
         }
 
-        return $this->request( self::TYPE_QUERY, $items );
+        return $this->request(self::TYPE_QUERY, $items);
     }
 
-    public function addItem(String $item_name, array $itens = [], $create_labels_if_missing = false)
+    public function addItem(string $item_name, array $itens = [], $create_labels_if_missing = false)
     {
         if (!$this->board_id || !$this->group_id)
             return -1;
 
         $arguments = [
-            'board_id'    => $this->board_id,
-            'group_id'    => $this->group_id,
-            'item_name'   => $item_name,
+            'board_id' => $this->board_id,
+            'group_id' => $this->group_id,
+            'item_name' => $item_name,
             'column_values' => Column::newColumnValues($itens),
         ];
 
@@ -182,12 +182,12 @@ class MondayBoard extends MondayAPI
         return $this->request(self::TYPE_MUTAT, $create);
     }
 
-    public function addSubItem( Int $parent_item_id, String $item_name, Array $itens = [], $create_labels_if_missing = false)
+    public function addSubItem(int $parent_item_id, string $item_name, array $itens = [], $create_labels_if_missing = false)
     {
         $arguments = [
-            'parent_item_id'  => $parent_item_id,
-            'item_name'       => $item_name,
-            'column_values'   => Column::newColumnValues( $itens ),
+            'parent_item_id' => $parent_item_id,
+            'item_name' => $item_name,
+            'column_values' => Column::newColumnValues($itens),
         ];
 
         $SubItem = new SubItem();
@@ -204,7 +204,8 @@ class MondayBoard extends MondayAPI
         return $this->request(self::TYPE_MUTAT, $create);
     }
 
-    public function archiveItem( Int $item_id ){
+    public function archiveItem(int $item_id)
+    {
         $Item = new Item();
 
         $archive = Query::create(
@@ -216,7 +217,7 @@ class MondayBoard extends MondayAPI
         return $this->request(self::TYPE_MUTAT, $archive);
     }
 
-    public function deleteItem( Int $item_id )
+    public function deleteItem(int $item_id)
     {
         $Item = new Item();
 
@@ -229,15 +230,15 @@ class MondayBoard extends MondayAPI
         return $this->request(self::TYPE_MUTAT, $delete);
     }
 
-    public function changeMultipleColumnValues( Int $item_id, Array $column_values = [] )
+    public function changeMultipleColumnValues(int $item_id, array $column_values = [])
     {
-        if(!$this->board_id || !$this->group_id)
+        if (!$this->board_id || !$this->group_id)
             return -1;
 
         $arguments = [
-            'board_id'      => $this->board_id,
-            'item_id'       => $item_id,
-            'column_values' => Column::newColumnValues( $column_values ),
+            'board_id' => $this->board_id,
+            'item_id' => $item_id,
+            'column_values' => Column::newColumnValues($column_values),
         ];
 
         $Item = new Item();
