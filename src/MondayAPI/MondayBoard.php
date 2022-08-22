@@ -245,8 +245,9 @@ class MondayBoard extends MondayAPI
 
     public function changeMultipleColumnValues(int $item_id, array $column_values = []): int|false
     {
-        if (!$this->board_id || !$this->group_id)
-            return -1;
+        if (!$this->board_id) {
+            return false;
+        }
 
         $arguments = [
             'board_id' => $this->board_id,
@@ -275,6 +276,3 @@ class MondayBoard extends MondayAPI
         return $this->request(self::TYPE_MUTAT, $query);
     }
 }
-
-
-?>
