@@ -52,7 +52,7 @@ class MondayAPI
             'http' => [
                 'method' => 'POST',
                 'header' => $headers,
-                'content' => $this->content($type, str_replace(['\r', '\n'], '', $request)),
+                'content' => $this->content($type, str_replace(["\r", "\n"], '', $request)),
             ]
         ]));
 
