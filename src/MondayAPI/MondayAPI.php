@@ -8,6 +8,8 @@ class MondayAPI
     private $API_Url     = "https://api.monday.com/v2/";
     private $debug       = false;
 
+    protected $version = '2025-01';
+
     const TYPE_QUERY    = 'query';
     const TYPE_MUTAT    = 'mutation';
 
@@ -42,7 +44,8 @@ class MondayAPI
         $headers = [
             'Content-Type: application/json',
             'User-Agent: [Tblack-IT] GraphQL Client',
-            'Authorization: ' . $this->APIV2_Token->getToken()
+            'Authorization: ' . $this->APIV2_Token->getToken(),
+            'API-Version: ' . $this->version,
         ];
 
         $data = @file_get_contents($this->API_Url, false, stream_context_create([
