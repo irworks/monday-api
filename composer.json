@@ -1,7 +1,7 @@
 {
-  "name" : "tblack-it/monday-api",
+  "name" : "irworks/monday-api",
   "description" : "Monday v2 API developed by TBLACK-IT",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "authors": [
     {
         "name": "Pedro Teixeira",
